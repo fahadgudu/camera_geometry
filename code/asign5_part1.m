@@ -39,7 +39,10 @@ M = calculate_projection_matrix(Points_2D,Points_3D);
 
 % disp('The projection matrix is:')
 % disp(M);
-
+[U,S,V] = svd(M);
+M_norm_A=-V(:,end);
+M_norm_A = reshape(M_norm_A, 3,4);
+M_norm_A;
 % [Projected_2D_Pts, Residual] = evaluate_points( M, Points_2D, Points_3D);
 % fprintf('\nThe total residual is: <%.4f>\n\n',Residual);
 
