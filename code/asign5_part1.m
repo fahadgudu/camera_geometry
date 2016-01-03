@@ -25,7 +25,6 @@ file_2d_norm_a = fopen('data/pts2d-norm-pic_a.txt','r');
 file_3d_norm   = fopen('data/pts3d-norm.txt','r');
 Points_2D = fscanf(file_2d_norm_a,formatSpec,size2d_norm)';
 Points_3D = fscanf(file_3d_norm,formatSpec,size3d_norm)';
-
 % % (Optional) Uncomment these four lines once you have your code working
 % % with the easier, normalized points above.
 % file_2d_pic_b = fopen('../data/pts2d-pic_b.txt','r');
@@ -44,14 +43,14 @@ M = calculate_projection_matrix(Points_2D,Points_3D);
 % [Projected_2D_Pts, Residual] = evaluate_points( M, Points_2D, Points_3D);
 % fprintf('\nThe total residual is: <%.4f>\n\n',Residual);
 
-visualize_points(Points_2D,Projected_2D_Pts);
+% visualize_points(Points_2D,Projected_2D_Pts);
 
 %% Calculate the camera center using the M found from previous step
 % !!! You will need to implement compute_camera_center. !!!
-Center = compute_camera_center(M);
+% Center = compute_camera_center(M);
 
-fprintf('The estimated location of camera is: <%.4f, %.4f, %.4f>\n',Center);
-plot3dview(Points_3D, Center)
+% fprintf('The estimated location of camera is: <%.4f, %.4f, %.4f>\n',Center);
+% plot3dview(Points_3D, Center)
 
 
 
