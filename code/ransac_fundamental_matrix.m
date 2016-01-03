@@ -23,19 +23,54 @@
 % right images.
 
 function [ Best_Fmatrix, inliers_a, inliers_b] = ransac_fundamental_matrix(matches_a, matches_b)
-
-
-%%%%%%%%%%%%%%%%
-% Your code here
-%%%%%%%%%%%%%%%%
-
-% Your ransac loop should contain a call to 'estimate_fundamental_matrix()'
-% that you wrote for part II.
-
-%placeholders, you can delete all of this
-Best_Fmatrix = estimate_fundamental_matrix(matches_a(1:10,:), matches_b(1:10,:));
-inliers_a = matches_a(1:30,:);
-inliers_b = matches_b(1:30,:);
-
+[row column] = size(matches_a);
+d = transpose(randsample(row,row));
+patchmatrix1 = zeros(8,2);
+patchmatrix2 = zeros(8,2);
+Best_Fmatrix = zeros(3,3);
+max_of_fm = 0;
+i = 1;
+j = 8;
+ for x = (1:103)
+    points_a = d(i:j);
+    patchmatrix1=matches_a(points_a,:);
+    patchmatrix2=matches_b(points_a,:);
+     i = i+8;
+     j = j+8;
+    F_matrix = estimate_fundamental_matrix(patchmatrix1, patchmatrix2);
+    [U,S,V] = svd(F_matrix);
+    M_norm_B=V(:,end);
+    M_norm_B = reshape(M_norm_B,3,3);
+    other_points = setdiff(d,points_a);
+    number_of_matches = 0;
+    inliersA = zeros(length(other_points),2);
+    inliersB = zeros(length(other_points),2);
+    inliersCount = 1;
+    for t = (1:length(other_points))
+        vt = other_points(t);
+        tu = num2cell(matches_a(vt:vt,1:end));
+        [u,v] = deal(tu{:});
+        vw = num2cell(matches_b(vt:vt,1:end));
+        [u_dash,v_dash] = deal(vw{:});
+        if ([u v 1] * M_norm_B * transpose([u_dash v_dash 1]) > 1.5)
+            number_of_matches = number_of_matches + 1;
+            inliersA(inliersCount:inliersCount,1:end) = [u v];
+            inliersB(inliersCount:inliersCount,1:end) = [u_dash v_dash];
+            inliersCount = inliersCount + 1; 
+        end
+    end
+    if ( x == 1 )
+        max_of_fm = number_of_matches;
+    end
+    if (max_of_fm <= number_of_matches)
+        max_of_fm  = number_of_matches;
+        Best_Fmatrix = M_norm_B;
+        inliersA( all(~inliersA,2), : ) = [];
+        inliersB( all(~inliersB,2), : ) = [];
+        inliers_a = inliersA;
+        inliers_b = inliersB;
+    end
+ end
+ 
 end
 
