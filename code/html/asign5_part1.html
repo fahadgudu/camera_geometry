@@ -1,0 +1,272 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>asign5_part1</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-01-04"><meta name="DC.source" content="asign5_part1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Calculate the projection matrix given corresponding 2D and 3D points</a></li><li><a href="#3">Calculate the camera center using the M found from previous step</a></li></ul></div><pre class="codeinput"><span class="comment">% Camera Calibration Stencil Code</span>
+<span class="comment">% CS 4495 / 6476: Computer Vision, Georgia Tech</span>
+<span class="comment">% Written by Henry Hu, Grady Williams, James Hays</span>
+
+<span class="comment">% This script</span>
+<span class="comment">% (1) Loads 2D and 3D data points</span>
+<span class="comment">% (2) Calculates the projection matrix from those points    (you code this)</span>
+<span class="comment">% (3) Computes the camera center from the projection matrix (you code this)</span>
+
+<span class="comment">% Relationship between coordinates in the world and coordinates in the</span>
+<span class="comment">% image defines the camera calibration. See Szeliski 6.2, 6.3 for reference</span>
+
+<span class="comment">% 2 pairs of corresponding points files are provided</span>
+<span class="comment">% Ground truth is provided for pts2d-norm-pic_a and pts3d-norm pair</span>
+<span class="comment">% You need to report the values calculated from pts2d-pic_b and pts3d</span>
+
+clear
+close <span class="string">all</span>
+
+formatSpec = <span class="string">'%f'</span>;
+size2d_norm = [2 Inf];
+size3d_norm = [3 Inf];
+
+file_2d_norm_a = fopen(<span class="string">'data/pts2d-norm-pic_a.txt'</span>,<span class="string">'r'</span>);
+file_3d_norm   = fopen(<span class="string">'data/pts3d-norm.txt'</span>,<span class="string">'r'</span>);
+Points_2D = fscanf(file_2d_norm_a,formatSpec,size2d_norm)';
+Points_3D = fscanf(file_3d_norm,formatSpec,size3d_norm)';
+<span class="comment">% % (Optional) Uncomment these four lines once you have your code working</span>
+<span class="comment">% % with the easier, normalized points above.</span>
+<span class="comment">% file_2d_pic_b = fopen('../data/pts2d-pic_b.txt','r');</span>
+<span class="comment">% file_3d = fopen('../data/pts3d.txt','r');</span>
+<span class="comment">% Points_2D = fscanf(file_2d_pic_b,formatSpec,size2d_norm)';</span>
+<span class="comment">% Points_3D = fscanf(file_3d,formatSpec,size3d_norm)';</span>
+</pre><h2>Calculate the projection matrix given corresponding 2D and 3D points<a name="2"></a></h2><p>!!! You will need to implement calculate_projection_matrix. !!!</p><pre class="codeinput">M = calculate_projection_matrix(Points_2D,Points_3D);
+
+<span class="comment">% disp('The projection matrix is:')</span>
+<span class="comment">% disp(M);</span>
+[U,S,V] = svd(M);
+M_norm_A=-V(:,end);
+M_norm_A = reshape(M_norm_A, 3,4);
+M_norm_A;
+<span class="comment">% [Projected_2D_Pts, Residual] = evaluate_points( M, Points_2D, Points_3D);</span>
+<span class="comment">% fprintf('\nThe total residual is: &lt;%.4f&gt;\n\n',Residual);</span>
+
+<span class="comment">% visualize_points(Points_2D,Projected_2D_Pts);</span>
+</pre><pre class="codeoutput">Randomly setting matrix entries as a placeholder
+
+M =
+
+  Columns 1 through 7
+
+    1.5706   -0.1490    0.2598    1.0000         0         0         0
+         0         0         0         0    1.5706   -0.1490    0.2598
+   -1.5282    0.9695    0.3802    1.0000         0         0         0
+         0         0         0         0   -1.5282    0.9695    0.3802
+   -0.6821    1.2856    0.4078    1.0000         0         0         0
+         0         0         0         0   -0.6821    1.2856    0.4078
+    0.4124   -1.0201   -0.0915    1.0000         0         0         0
+         0         0         0         0    0.4124   -1.0201   -0.0915
+    1.2095    0.2812   -0.1280    1.0000         0         0         0
+         0         0         0         0    1.2095    0.2812   -0.1280
+    0.8819   -0.8481    0.5255    1.0000         0         0         0
+         0         0         0         0    0.8819   -0.8481    0.5255
+   -0.9442   -1.1583   -0.3759    1.0000         0         0         0
+         0         0         0         0   -0.9442   -1.1583   -0.3759
+    0.0415    1.3445    0.3240    1.0000         0         0         0
+         0         0         0         0    0.0415    1.3445    0.3240
+   -0.7975    0.3017   -0.0826    1.0000         0         0         0
+         0         0         0         0   -0.7975    0.3017   -0.0826
+   -0.4329   -1.4151   -0.2774    1.0000         0         0         0
+         0         0         0         0   -0.4329   -1.4151   -0.2774
+   -1.1475   -0.0772   -0.2667    1.0000         0         0         0
+         0         0         0         0   -1.1475   -0.0772   -0.2667
+   -0.5149   -1.1784   -0.1401    1.0000         0         0         0
+         0         0         0         0   -0.5149   -1.1784   -0.1401
+    0.1993   -0.2854   -0.2114    1.0000         0         0         0
+         0         0         0         0    0.1993   -0.2854   -0.2114
+   -0.4320    0.2143   -0.1053    1.0000         0         0         0
+         0         0         0         0   -0.4320    0.2143   -0.1053
+   -0.7481   -0.3840   -0.2408    1.0000         0         0         0
+         0         0         0         0   -0.7481   -0.3840   -0.2408
+    0.8078   -0.1196   -0.2631    1.0000         0         0         0
+         0         0         0         0    0.8078   -0.1196   -0.2631
+   -0.7605   -0.5792   -0.1936    1.0000         0         0         0
+         0         0         0         0   -0.7605   -0.5792   -0.1936
+    0.3237    0.7970    0.2170    1.0000         0         0         0
+         0         0         0         0    0.3237    0.7970    0.2170
+    1.3089    0.5786   -0.1887    1.0000         0         0         0
+         0         0         0         0    1.3089    0.5786   -0.1887
+    1.2323    1.4421    0.4506    1.0000         0         0         0
+         0         0         0         0    1.2323    1.4421    0.4506
+
+  Columns 8 through 12
+
+         0   -1.6469    0.1562   -0.2724    1.0486
+    1.0000    0.0947   -0.0543    0.0947   -0.3645
+         0   -2.5752    1.6337    0.6407   -1.6851
+    1.0000    0.1522    0.3882    0.1522   -0.4004
+         0   -0.6437    1.2132    0.3848   -0.9437
+    1.0000    0.1713    0.5400    0.1713   -0.4200
+         0   -0.4405    1.0897    0.0977    1.0682
+    1.0000    0.0064    0.0713    0.0064    0.0699
+         0   -0.7350   -0.1709    0.0778    0.6077
+    1.0000   -0.0099    0.0217   -0.0099   -0.0771
+         0   -1.1062    1.0638   -0.6591    1.2543
+    1.0000    0.3392   -0.5474    0.3392   -0.6454
+         0   -0.2558   -0.3138   -0.1018   -0.2709
+    1.0000    0.3246    1.0002    0.3246    0.8635
+         0    0.0190    0.6146    0.1481   -0.4571
+    1.0000    0.1181    0.4901    0.1181   -0.3645
+         0   -0.6302    0.2384   -0.0653   -0.7902
+    1.0000    0.0025   -0.0093    0.0025    0.0307
+         0    0.3168    1.0356    0.2030    0.7318
+    1.0000    0.1770    0.9031    0.1770    0.6382
+         0   -1.2141   -0.0817   -0.2822   -1.0580
+    1.0000    0.0883    0.0256    0.0883    0.3312
+         0    0.1784    0.4082    0.0485    0.3464
+    1.0000    0.0473    0.3979    0.0473    0.3377
+         0   -0.0625    0.0895    0.0663    0.3137
+    1.0000    0.0251    0.0339    0.0251    0.1189
+         0   -0.1862    0.0924   -0.0454   -0.4310
+    1.0000    0.0025   -0.0052    0.0025    0.0242
+         0   -0.3590   -0.1843   -0.1156   -0.4799
+    1.0000    0.0703    0.1121    0.0703    0.2920
+         0   -0.4935    0.0731    0.1607    0.6109
+    1.0000    0.0218    0.0099    0.0218    0.0830
+         0   -0.3104   -0.2364   -0.0790   -0.4081
+    1.0000    0.0565    0.1691    0.0565    0.2920
+         0    0.0359    0.0884    0.0241   -0.1109
+    1.0000    0.0649    0.2385    0.0649   -0.2992
+         0   -0.6713   -0.2968    0.0968    0.5129
+    1.0000   -0.0109    0.0333   -0.0109   -0.0575
+         0   -0.1733   -0.2028   -0.0634    0.1406
+    1.0000    0.2040    0.6528    0.2040   -0.4527
+
+</pre><h2>Calculate the camera center using the M found from previous step<a name="3"></a></h2><p>!!! You will need to implement compute_camera_center. !!! Center = compute_camera_center(M);</p><pre class="codeinput"><span class="comment">% fprintf('The estimated location of camera is: &lt;%.4f, %.4f, %.4f&gt;\n',Center);</span>
+<span class="comment">% plot3dview(Points_3D, Center)</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Camera Calibration Stencil Code
+% CS 4495 / 6476: Computer Vision, Georgia Tech
+% Written by Henry Hu, Grady Williams, James Hays
+
+% This script 
+% (1) Loads 2D and 3D data points
+% (2) Calculates the projection matrix from those points    (you code this)
+% (3) Computes the camera center from the projection matrix (you code this)
+
+% Relationship between coordinates in the world and coordinates in the
+% image defines the camera calibration. See Szeliski 6.2, 6.3 for reference
+
+% 2 pairs of corresponding points files are provided
+% Ground truth is provided for pts2d-norm-pic_a and pts3d-norm pair
+% You need to report the values calculated from pts2d-pic_b and pts3d
+
+clear
+close all
+
+formatSpec = '%f';
+size2d_norm = [2 Inf];
+size3d_norm = [3 Inf];
+
+file_2d_norm_a = fopen('data/pts2d-norm-pic_a.txt','r');
+file_3d_norm   = fopen('data/pts3d-norm.txt','r');
+Points_2D = fscanf(file_2d_norm_a,formatSpec,size2d_norm)';
+Points_3D = fscanf(file_3d_norm,formatSpec,size3d_norm)';
+% % (Optional) Uncomment these four lines once you have your code working
+% % with the easier, normalized points above.
+% file_2d_pic_b = fopen('../data/pts2d-pic_b.txt','r');
+% file_3d = fopen('../data/pts3d.txt','r');
+% Points_2D = fscanf(file_2d_pic_b,formatSpec,size2d_norm)';
+% Points_3D = fscanf(file_3d,formatSpec,size3d_norm)';
+
+
+%% Calculate the projection matrix given corresponding 2D and 3D points
+% !!! You will need to implement calculate_projection_matrix. !!!
+M = calculate_projection_matrix(Points_2D,Points_3D);
+
+% disp('The projection matrix is:')
+% disp(M);
+[U,S,V] = svd(M);
+M_norm_A=-V(:,end);
+M_norm_A = reshape(M_norm_A, 3,4);
+M_norm_A;
+% [Projected_2D_Pts, Residual] = evaluate_points( M, Points_2D, Points_3D);
+% fprintf('\nThe total residual is: <%.4f>\n\n',Residual);
+
+% visualize_points(Points_2D,Projected_2D_Pts);
+
+%% Calculate the camera center using the M found from previous step
+% !!! You will need to implement compute_camera_center. !!!
+% Center = compute_camera_center(M);
+
+% fprintf('The estimated location of camera is: <%.4f, %.4f, %.4f>\n',Center);
+% plot3dview(Points_3D, Center)
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
